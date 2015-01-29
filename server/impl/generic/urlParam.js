@@ -6,11 +6,11 @@
 
 var mongoose = require('mongoose');
 
-exports = module.exports = function(config) {
-  config = config || {};
+exports = module.exports = function(route, param) {
+  param = param || {};
 
-  var modelName = config.model || '',
-    mapsToField = config.mapsToField || '_id',
+  var modelName = route.model || '',
+    mapsToField = param.mapsToField || '_id',
     Model = null;
 
   if (!modelName) {

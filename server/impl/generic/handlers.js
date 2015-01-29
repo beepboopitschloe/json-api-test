@@ -7,28 +7,47 @@
 var mongoose = require('mongoose'),
   _ = require('lodash');
 
-exports = module.exports = function(config) {
-  config = config || {};
-
-  var method = config.method || 'GET',
-    modelName = config.model || '',
+exports = module.exports = function(route, method) {
+  // variables to hold the model for our return type
+  var modelName = route.model || '',
     Model = null;
+
+  // flag which tells us whether or not we have already found a return point
+  var returned = false;
+
+  // route return/manipulation type defaults to its model type
+  route.manipulates = route.manipulates || route.model;
 
   if (!modelName) {
     // @TODO better error message
     throw new Error('Expected model definition, got undefined.');
   } else {
     // get model definition
-    Model = mongoose.model(modelName);
+    try {
+      Model = mongoose.model(modelName);
+    } catch (e) {
+      // an error here means that the schema is not registered.
+      // check the references list to see if we're using a reference name
+      // instead of an object schema.
+      var ref = _.findWhere(route.references, {as: modelName});
+
+      if (ref) {
+        Model = mongoose.model(ref.model);
+      } else {
+        throw e;
+      }
+    }
   }
 
-  if (method === 'GET') {
+  if (method.method === 'GET') {
     return function(req, res) {
-      if (req.urlParams.has(modelName)) {
-        // if we already have an object from the URL params, assume that that's
-        // what we want to return 
-        var param = req.urlParams.get(modelName);
-        
+      // first, check if we have a URL parameter that corresponds to our return
+      // type.
+      // @TODO implement referencing here?
+      if (req.urlParams.has(route.manipulates)) {
+        // return this data
+        var param = req.urlParams.get(route.manipulates);
+
         if (param.data) {
           var content;
 
@@ -46,17 +65,76 @@ exports = module.exports = function(config) {
           // nothing gets found
           return res.respond({
             status: 404,
-            error: 'Could not find ' + modelName
+            error: 'Could not find ' + route.manipulates
               + ' with id ' + param.param.value + '.'
           });
         }
-        return res.respond({
-          content: [req.urlParams[modelName]]
-        });
-      } else {
-        // otherwise we need to actually look things up
-        
-        // automatically apply query params to search
+      }
+
+      // next, process references and check if we're meant to return any of
+      // those.
+      // @TODO implement references which depend on other references. currently
+      // can only depend on URL parameters
+      _.each(route.references, function(reference) {
+        if (route.manipulates === reference.model
+            || route.manipulates === reference.as) {
+          var param = req.urlParams.get(reference.source.model),
+            sourceObjects = param.data;
+
+          if (!sourceObjects) {
+            return res.respond({
+              status: 404,
+              error: 'Could not find ' + reference.source.model
+                + ' with id ' + param.param.value
+            });
+          }
+
+          // if we have the source data, then we need to map it to the
+          // reference. To do that, we need to get the array of possible values
+          // to query the reference data against.
+          if (!_.isArray(sourceObjects)) {
+            sourceObjects = [sourceObjects];
+          }
+
+          var queryArr = [];
+
+          _.each(sourceObjects, function(source) {
+            console.log('source', source, 'field', reference.source.field);
+            queryArr = _.union(queryArr, source[reference.source.field]);
+          });
+
+          var query = {};
+          query[reference.referenceBy] = {
+            $in: queryArr
+          };
+
+          // now we can actually do the query
+          // mark our return flag first to avoid multiple responses
+          returned = true;
+
+          console.log('checking', reference.model, 'with query', query);
+
+          mongoose.model(reference.model).find(query, function(err, data) {
+            if (err) {
+              console.error(err);
+              return res.respond({
+                status: 500,
+                error: 'Internal server error.'
+              });
+            } else {
+              return res.respond({
+                content: data
+              });
+            }
+          });
+        }
+      });
+      
+      // @TODO joins
+      
+      // finally, if we haven't returned anything yet, we will default to
+      // querying against the returned data type
+      if (!returned) {
         Model.find(req.query, function(err, data) {
           if (err) {
             console.error(err);
@@ -73,7 +151,7 @@ exports = module.exports = function(config) {
         });
       }
     } 
-  } else if (method === 'POST') {
+  } else if (method.method === 'POST') {
     return function(req, res) {
       console.log('generic post');
 
@@ -93,7 +171,7 @@ exports = module.exports = function(config) {
         }
       });
     }
-  } else if (method === 'PUT') {
+  } else if (method.method === 'PUT') {
     return function(req, res) {
       var id;
 
@@ -132,7 +210,7 @@ exports = module.exports = function(config) {
         }
       });
     }
-  } else if (method === 'DELETE') {
+  } else if (method.method === 'DELETE') {
     return function(req, res) {
       var id;
 

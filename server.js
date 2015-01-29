@@ -22,6 +22,8 @@ app.use(urlParams);
 
 // models
 require('./server/models/user');
+require('./server/models/team');
+require('./server/models/event');
 
 // read endpoints list
 var endpoints = require('./server/endpoints/endpoints');
@@ -34,16 +36,12 @@ _.each(endpoints.routes, function(route) {
     _.each(route.urlParams, function(param) {
       var impl;
 
-      if (route.model && !param.model) {
-        param.model = route.model;
-      }
-
       if (param.implementation) {
         console.log('Using custom implementation for', param.name, route.url);
         impl = require(endpoints.implementationRoot + param.implementation);
       } else {
         console.log('Using generic implementation for', param.name, route.url);
-        impl = urlParamHandlerFactory(param);
+        impl = urlParamHandlerFactory(route, param);
       }
 
       app.param(':' + param.name, impl);
@@ -55,16 +53,12 @@ _.each(endpoints.routes, function(route) {
     // can be defined explicitly or created
     var impl;
 
-    if (route.model && !method.model) {
-      method.model = route.model;
-    }
-
     if (method.implementation) {
       console.log('Using custom implementation for', method.method, route.url);
       impl = require(endpoints.implementationRoot + method.implementation);
     } else {
       console.log('Using generic implementation for', method.method, route.url);
-      impl = routeHandlerFactory(method);
+      impl = routeHandlerFactory(route, method);
     }
 
     switch (method.method) {
