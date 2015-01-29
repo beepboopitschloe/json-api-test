@@ -1,0 +1,24 @@
+{
+  "name": "json-api-test",
+  "version": "0.0.1",
+  "description": "",
+  "main": "server.js",
+  "directories": {
+    "test": "test"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "grunt"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git@noahmuth.com:apicreator.git"
+  },
+  "author": "Noah Muth <noahmuth@gmail.com> (http://github.com/nmuth)",
+  "dependencies": {
+    "body-parser": "^1.10.1",
+    "express": "^4.11.0",
+    "lodash": "^3.0.0",
+    "mongoose": "^3.8.22"
+  }
+}
