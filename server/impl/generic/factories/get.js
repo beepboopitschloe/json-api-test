@@ -71,8 +71,13 @@ function newHandler(route, Model) {
         var queryArr = [];
 
         _.each(sourceObjects, function(source) {
-          console.log('source', source, 'field', reference.source.field);
-          queryArr = _.union(queryArr, source[reference.source.field]);
+          var referencedValue = source[reference.source.field];
+
+          if (!_.isArray(referencedValue)) {
+            referencedValue = [referencedValue];
+          }
+
+          queryArr = _.union(queryArr, referencedValue);
         });
 
         var query = {};

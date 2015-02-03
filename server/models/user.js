@@ -9,7 +9,7 @@ var mongoose = require('mongoose'),
 
 module.exports = mongoose.model('User', {
   _id: ShortId,
-  
+
   username: {
     type: String,
     default: ''
@@ -21,6 +21,6 @@ module.exports = mongoose.model('User', {
     type: String
   },
   teamId: {
-    type: 'ObjectId'
+    type: ShortId
   }
 });

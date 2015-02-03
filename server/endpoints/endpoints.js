@@ -115,7 +115,7 @@ exports = module.exports = {
 
       // the field in the referenced model which we are indexing by. defaults to
       // _id
-      referenceBy: '_id',
+      referenceBy: 'teamId',
 
       // source of the reference
       source: {
@@ -125,7 +125,7 @@ exports = module.exports = {
 
         // the field we are using for the reference. can be a string or number
         // for a single value return, or an array for multi-value return.
-        field: 'members'
+        field: '_id'
       }
     }],
 
