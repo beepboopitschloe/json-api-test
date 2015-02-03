@@ -9,8 +9,6 @@ var mongoose = require('mongoose'),
 
 function newHandler(route, Model) {
   return function(req, res) {
-    console.log('generic post');
-
     var object = new Model(req.body);
 
     object.save(function(err) {

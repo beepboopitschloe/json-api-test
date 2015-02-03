@@ -11,8 +11,8 @@ function newHandler(route, Model) {
   return function(req, res) {
     var id;
 
-    if (req.urlParams.has(modelName)) {
-      id = req.urlParams.get(modelName).param.value;
+    if (req.urlParams.has(route.model)) {
+      id = req.urlParams.get(route.model).param.value;
     } else {
       id = req.body._id;
     }
@@ -37,7 +37,7 @@ function newHandler(route, Model) {
         // 404, since the user provided a specific ID and we found nothing
         return res.respond({
           status: 404,
-          error: 'Could not find ' + modelName + ' with id ' + id
+          error: 'Could not find ' + route.model + ' with id ' + id
         });
       } else {
         return res.respond({

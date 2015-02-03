@@ -11,8 +11,8 @@ function newHandler(route, Model) {
   return function(req, res) {
     var id;
 
-    if (req.urlParams.has(modelName)) {
-      id = req.urlParams.get(modelName).param.value;
+    if (req.urlParams.has(route.model)) {
+      id = req.urlParams.get(route.model).param.value;
     } else {
       id = req.body._id;
     }
