@@ -61,6 +61,9 @@ function newHandler(route, Model) {
           });
         }
 
+        // referenceBy defaults to _id
+        reference.referenceBy = reference.referenceBy || '_id';
+
         // if we have the source data, then we need to map it to the
         // reference. To do that, we need to get the array of possible values
         // to query the reference data against.

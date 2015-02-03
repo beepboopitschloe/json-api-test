@@ -10,6 +10,8 @@ var mongoose = require('mongoose'),
 module.exports = mongoose.model('Event', {
   _id: ShortId,
   
+  name: String,
+  location: String,
   date: Date,
   teams: [String]
 });

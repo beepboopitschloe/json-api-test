@@ -58,11 +58,12 @@ exports = module.exports = {
       method: 'DELETE',
       description: 'Delete a user by ID.'
     }]
+  },
 
   /**
    * /team endpoints
    */
-  },{
+  {
     url: '/team',
     model: 'Team',
     description: 'Route to get and create teams of users.',
@@ -141,9 +142,69 @@ exports = module.exports = {
     methods: [{
       method: 'GET',
       description: 'Get the list of users.'
+    }]
+  },
+
+  /**
+   * event endpoints
+   */
+  {
+    url: '/event',
+    model: 'Event',
+    description: 'Route to get a list of events.',
+    methods: [{
+      method: 'GET',
+      description: 'Get a filtered list of events.'
     },{
       method: 'POST',
-      description: 'Add a user to the list.'
+      description: 'Create a new event.'
+    }]
+  },{
+    url: '/event/:eventId',
+    model: 'Event',
+    description: 'Route to get or update an event definition.',
+
+    urlParams: [{
+      name: 'eventId',
+      type: 'string',
+      description: 'The ID of the event to fetch or update.'
+    }],
+
+    methods: [{
+      method: 'GET',
+      description: 'Get a single event.'
+    },{
+      method: 'PUT',
+      description: 'Update an event.'
+    },{
+      method: 'DELETE',
+      description: 'Delete an event.'
+    }]
+  },{
+    url: '/event/:eventId/team',
+    model: 'Event',
+    description: 'Get a list of all teams attending an event.',
+
+    urlParams: [{
+      name: 'eventId',
+      type: 'string',
+      description: 'The ID of the event to reference.'
+    }],
+
+    references: [{
+      model: 'Team',
+
+      source: {
+        model: 'Event',
+        field: 'teams'
+      }
+    }],
+
+    manipulates: 'Team',
+
+    methods: [{
+      method: 'GET',
+      description: 'Get the list of teams.'
     }]
   }]
 }
