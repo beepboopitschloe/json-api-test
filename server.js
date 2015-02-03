@@ -44,7 +44,7 @@ _.each(endpoints.routes, function(route) {
         impl = urlParamHandlerFactory(route, param);
       }
 
-      app.param(':' + param.name, impl);
+      app.param(param.name, impl);
     });
   }
 
