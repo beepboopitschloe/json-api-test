@@ -4,9 +4,12 @@
  * Exports the model for a user.
  */
 
-var mongoose = require('mongoose');
+var mongoose = require('mongoose'),
+  ShortId = require('../../config/short-id');
 
 module.exports = mongoose.model('User', {
+  _id: ShortId,
+  
   username: {
     type: String,
     default: ''
@@ -16,5 +19,8 @@ module.exports = mongoose.model('User', {
   },
   passwordHash: {
     type: String
+  },
+  teamId: {
+    type: 'ObjectId'
   }
 });

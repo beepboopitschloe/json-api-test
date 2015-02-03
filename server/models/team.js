@@ -4,9 +4,11 @@
  * Model for a Team object.
  */
 
-var mongoose = require('mongoose');
+var mongoose = require('mongoose'),
+  ShortId = require('../../config/short-id');
 
 module.exports = mongoose.model('Team', {
-  name: String,
-  members: [String]
+  _id: ShortId,
+  
+  name: String
 });
